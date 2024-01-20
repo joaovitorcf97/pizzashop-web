@@ -1,8 +1,10 @@
 import { Helmet, HelmetProvider } from "react-helmet-async";
+import { QueryClientProvider } from "react-query";
 import { RouterProvider } from "react-router-dom";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "./components/theme/theme-provider";
 import "./global.css";
+import { queryClient } from "./lib/react-query";
 import { router } from "./routes";
 
 export function App() {
@@ -11,7 +13,9 @@ export function App() {
       <ThemeProvider storageKey="pizzashop-theme" defaultTheme="system">
         <Helmet titleTemplate="%s | pizza.shop" />
         <Toaster position="top-right" richColors />
-        <RouterProvider router={router} />
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+        </QueryClientProvider>
       </ThemeProvider>
     </HelmetProvider>
   );
