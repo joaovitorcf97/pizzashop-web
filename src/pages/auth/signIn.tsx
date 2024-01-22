@@ -1,9 +1,11 @@
+import { signIn } from "@/api/sign-in";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { useMutation } from "react-query";
+import { Link, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -14,22 +16,24 @@ const sigbInForm = z.object({
 type SignInForm = z.infer<typeof sigbInForm>;
 
 export function SignIn() {
+  const [searchParams] = useSearchParams();
   const {
     register,
     handleSubmit,
     formState: { isSubmitting },
-  } = useForm<SignInForm>();
+  } = useForm<SignInForm>({
+    defaultValues: {
+      email: searchParams.get("email") ?? "",
+    },
+  });
+
+  const { mutateAsync: authenticate } = useMutation({ mutationFn: signIn });
 
   async function handleSignIn(data: SignInForm) {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await authenticate({ email: data.email });
 
-      toast.success("Enviamos um link de autenticão para seu e-mail!", {
-        action: {
-          label: "Reenviar link",
-          onClick: () => handleSignIn(data),
-        },
-      });
+      toast.success("Enviamos um link de autenticão para seu e-mail!");
     } catch (error) {
       toast.error("Ocorreu um erro ao enviar o link de autenticação!");
     }
